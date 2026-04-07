@@ -1,0 +1,79 @@
+{% extends "base_flask.html" %}
+
+{% block title %}Products - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box"></i> Products</h2>
+    <a href="{{ url_for('product_create') }}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Add New Product
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search products by name or HSN code..." value="{{ search }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{{ url_for('product_list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>HSN Code</th>
+                        <th>Unit</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.hsn_code }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ product.unit.title() }}</span>
+                        </td>
+                        <td>{{ product.created_at.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            <a href="{{ url_for('product_update', id=product.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ url_for('product_delete', id=product.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this product?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-box fa-3x text-muted mb-3"></i>
+            <h5>No products found</h5>
+            <p class="text-muted">Get started by adding your first product.</p>
+            <a href="{{ url_for('product_create') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

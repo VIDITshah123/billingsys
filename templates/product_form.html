@@ -1,0 +1,72 @@
+{% extends "base_flask.html" %}
+
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %} - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    {% if product %}
+                        <i class="fas fa-edit"></i> Edit Product
+                    {% else %}
+                        <i class="fas fa-plus"></i> Add New Product
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.hsn_code.label(class="form-label") }}
+                        {{ form.hsn_code(class="form-control" + (" is-invalid" if form.hsn_code.errors else "")) }}
+                        {% if form.hsn_code.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.hsn_code.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.unit.label(class="form-label") }}
+                        {{ form.unit(class="form-select" + (" is-invalid" if form.unit.errors else "")) }}
+                        {% if form.unit.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.unit.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('product_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> 
+                            {% if product %}Update Product{% else %}Add Product{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="company-info">
+            <h2 class="text-center mb-3">Welcome to VIDHIM ENTERPRISES Billing System</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Address:</strong> FIRST FLOOR, 105, BHAURAO UDYOG NAGAR, KHARIGAON , ABOVE S K STEEL, BHAYANDER (E)-401105</p>
+                    <p><strong>Phone:</strong> +91 9892352600</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Email:</strong> vidhimenterprises@gmail.com</p>
+                    <p><strong>GST:</strong> 27AXVPS9856J1Z4</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Customers</h5>
+                <p class="card-text">Manage customer information</p>
+                <a href="{% url 'customer_list' %}" class="btn btn-primary">Manage Customers</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-box fa-3x mb-3 text-success"></i>
+                <h5 class="card-title">Products</h5>
+                <p class="card-text">Manage product catalog</p>
+                <a href="{% url 'product_list' %}" class="btn btn-success">Manage Products</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-file-invoice-dollar fa-3x mb-3 text-warning"></i>
+                <h5 class="card-title">Invoices</h5>
+                <p class="card-text">Create and manage invoices</p>
+                <a href="{% url 'invoice_list' %}" class="btn btn-warning">Manage Invoices</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-bar fa-3x mb-3 text-info"></i>
+                <h5 class="card-title">Reports</h5>
+                <p class="card-text">Generate reports and analytics</p>
+                <a href="{% url 'reports' %}" class="btn btn-info">Generate Reports</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'customer_create' %}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add New Customer
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'product_create' %}" class="btn btn-outline-success btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add New Product
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'invoice_create' %}" class="btn btn-outline-warning btn-sm w-100">
+                            <i class="fas fa-plus"></i> Create New Invoice
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'reports' %}" class="btn btn-outline-info btn-sm w-100">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

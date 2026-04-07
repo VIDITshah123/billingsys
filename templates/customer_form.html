@@ -1,0 +1,73 @@
+{% extends "base_flask.html" %}
+
+{% block title %}{% if customer %}Edit Customer{% else %}Add Customer{% endif %} - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    {% if customer %}
+                        <i class="fas fa-edit"></i> Edit Customer
+                    {% else %}
+                        <i class="fas fa-plus"></i> Add New Customer
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.address.label(class="form-label") }}
+                        {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), rows="3") }}
+                        {% if form.address.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.address.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.gst_number.label(class="form-label") }}
+                        {{ form.gst_number(class="form-control" + (" is-invalid" if form.gst_number.errors else ""), placeholder="e.g., 27AXVPS9856J1Z4") }}
+                        {% if form.gst_number.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.gst_number.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Format: 2 digits + 5 letters + 4 digits + 1 letter + 1 digit + Z + 1 digit</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('customer_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 
+                            {% if customer %}Update Customer{% else %}Add Customer{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

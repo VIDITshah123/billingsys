@@ -1,0 +1,176 @@
+{% extends "base_flask.html" %}
+
+{% block title %}Invoice Details - {{ invoice.invoice_number }} - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-file-invoice"></i> Invoice {{ invoice.invoice_number }}</h4>
+                <div>
+                    <a href="{{ url_for('generate_invoice_pdf', id=invoice.id) }}" class="btn btn-primary me-2">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                    <a href="{{ url_for('save_invoice', id=invoice.id) }}" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Invoice
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Company and Customer Info -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>{{ company_info.name }}</h5>
+                        <p class="mb-1">{{ company_info.address }}</p>
+                        <p class="mb-1">Phone: {{ company_info.phone }}</p>
+                        <p class="mb-1">Email: {{ company_info.email }}</p>
+                        <p class="mb-1">GST: {{ company_info.gst_no }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Bill To:</h5>
+                        <p class="mb-1"><strong>{{ invoice.customer.name }}</strong></p>
+                        <p class="mb-1">{{ invoice.customer.address }}</p>
+                        <p class="mb-1">GST: {{ invoice.customer.gst_number }}</p>
+                    </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+                        <p><strong>Invoice Date:</strong> {{ invoice.invoice_date.strftime('%d-%m-%Y') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tax Type:</strong> {% if invoice.tax_type == 'cgst_sgst' %}CGST + SGST{% else %}IGST{% endif %}</p>
+                    </div>
+                </div>
+
+                <!-- Invoice Items -->
+                <h5>Invoice Items</h5>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>S.No</th>
+                                <th>Product Name</th>
+                                <th>HSN Code</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in invoice.items %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.product.hsn_code }}</td>
+                                <td>{{ "%.2f"|format(item.quantity) }} {{ item.product.unit }}</td>
+                                <td>Rs. {{ "%.2f"|format(item.rate) }}</td>
+                                <td>Rs. {{ "%.2f"|format(item.total) }}</td>
+                                <td>
+                                    <form method="post" action="{{ url_for('delete_invoice_item', id=invoice.id, item_id=item.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this item?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No items added yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add Item Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6><i class="fas fa-plus"></i> Add New Item</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('add_invoice_item', id=invoice.id) }}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="product_id" class="form-label">Product</label>
+                                    <select name="product_id" id="product_id" class="form-select" required>
+                                        <option value="">Select a product</option>
+                                        {% for product in products %}
+                                        <option value="{{ product.id }}">{{ product.name }} ({{ product.unit }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="quantity" class="form-label">Quantity</label>
+                                    <input type="number" name="quantity" id="quantity" class="form-control" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="rate" class="form-label">Rate</label>
+                                    <input type="number" name="rate" id="rate" class="form-control" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-success d-block w-100">
+                                        <i class="fas fa-plus"></i> Add Item
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tax Calculation -->
+                <div class="row">
+                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td><strong>Subtotal:</strong></td>
+                                <td class="text-end">Rs. {{ "%.2f"|format(invoice.subtotal) }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CGST (2.5%):</strong></td>
+                                <td class="text-end">Rs. {{ "%.2f"|format(invoice.cgst) }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SGST (2.5%):</strong></td>
+                                <td class="text-end">Rs. {{ "%.2f"|format(invoice.sgst) }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IGST (5%):</strong></td>
+                                <td class="text-end">Rs. {{ "%.2f"|format(invoice.igst) }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Roundoff:</strong></td>
+                                <td class="text-end">Rs. {{ "%.2f"|format(invoice.roundoff) }}</td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><strong>Total:</strong></td>
+                                <td class="text-end"><strong>Rs. {{ "%.2f"|format(invoice.total) }}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('invoice_list') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Invoices
+                    </a>
+                    <div>
+                        <a href="{{ url_for('generate_invoice_pdf', id=invoice.id) }}" class="btn btn-primary me-2">
+                            <i class="fas fa-download"></i> Download PDF
+                        </a>
+                        <a href="{{ url_for('save_invoice', id=invoice.id) }}" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Invoice
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

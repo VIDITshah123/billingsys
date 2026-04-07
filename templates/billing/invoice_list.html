@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoices - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-invoice-dollar"></i> Invoices</h2>
+    <a href="{% url 'invoice_create' %}" class="btn btn-warning">
+        <i class="fas fa-plus"></i> Create New Invoice
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search invoices by number or customer..." value="{{ search }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-warning">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'invoice_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        {% if invoices %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td><strong>{{ invoice.invoice_number }}</strong></td>
+                        <td>{{ invoice.invoice_date|date:"d-m-Y" }}</td>
+                        <td>{{ invoice.customer.name }}</td>
+                        <td>Rs. {{ invoice.total|floatformat:2 }}</td>
+                        <td>{{ invoice.created_at|date:"d-m-Y" }}</td>
+                        <td>
+                            <a href="{% url 'invoice_detail' invoice.pk %}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'generate_invoice_pdf' invoice.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <a href="{% url 'invoice_update' invoice.pk %}" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'invoice_delete' invoice.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+            <h5>No invoices found</h5>
+            <p class="text-muted">Get started by creating your first invoice.</p>
+            <a href="{% url 'invoice_create' %}" class="btn btn-warning">
+                <i class="fas fa-plus"></i> Create Invoice
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

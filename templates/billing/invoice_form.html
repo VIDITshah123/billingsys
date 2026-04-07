@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if invoice %}Edit Invoice{% else %}Create Invoice{% endif %} - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    {% if invoice %}
+                        <i class="fas fa-edit"></i> Edit Invoice
+                    {% else %}
+                        <i class="fas fa-plus"></i> Create New Invoice
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" id="invoiceForm">
+                    {% csrf_token %}
+                    
+                    <!-- Invoice Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            {{ form.invoice_number|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.invoice_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.customer|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.tax_type|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Invoice Items -->
+                    <h5>Invoice Items</h5>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                <tr class="item-row">
+                                    <td>{{ form.product }}</td>
+                                    <td>{{ form.quantity }}</td>
+                                    <td>{{ form.rate }}</td>
+                                    <td><span class="item-total">0.00</span></td>
+                                    <td>
+                                        {% if forloop.counter0 > 0 %}
+                                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {% endif %}
+                                        {{ form.id }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="button" class="btn btn-outline-success" id="addItem">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                            <a href="{% url 'invoice_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> 
+                            {% if invoice %}Update Invoice{% else %}Create Invoice{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemsTable = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
+    const addButton = document.getElementById('addItem');
+    let itemCount = document.querySelectorAll('.item-row').length;
+
+    // Calculate item total
+    function calculateItemTotal(row) {
+        const quantity = parseFloat(row.querySelector('input[name$="-quantity"]').value) || 0;
+        const rate = parseFloat(row.querySelector('input[name$="-rate"]').value) || 0;
+        const total = quantity * rate;
+        row.querySelector('.item-total').textContent = total.toFixed(2);
+    }
+
+    // Add event listeners to existing rows
+    document.querySelectorAll('.item-row').forEach(function(row) {
+        const quantityInput = row.querySelector('input[name$="-quantity"]');
+        const rateInput = row.querySelector('input[name$="-rate"]');
+        
+        quantityInput.addEventListener('input', () => calculateItemTotal(row));
+        rateInput.addEventListener('input', () => calculateItemTotal(row));
+        calculateItemTotal(row);
+    });
+
+    // Remove item functionality
+    document.querySelectorAll('.remove-item').forEach(function(button) {
+        button.addEventListener('click', function() {
+            this.closest('tr').remove();
+        });
+    });
+
+    // Add new item
+    addButton.addEventListener('click', function() {
+        const newRow = itemsTable.insertRow();
+        newRow.className = 'item-row';
+        
+        // Get product options from the first row
+        const firstProductSelect = document.querySelector('select[name$="-product"]');
+        const productOptions = firstProductSelect.innerHTML;
+        
+        newRow.innerHTML = `
+            <td><select name="form-${itemCount}-product" class="form-select">
+                ${productOptions}
+            </select></td>
+            <td><input type="number" name="form-${itemCount}-quantity" class="form-control" step="0.01" min="0"></td>
+            <td><input type="number" name="form-${itemCount}-rate" class="form-control" step="0.01" min="0"></td>
+            <td><span class="item-total">0.00</span></td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger remove-item">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+
+        // Add event listeners to new row
+        const quantityInput = newRow.querySelector('input[name$="-quantity"]');
+        const rateInput = newRow.querySelector('input[name$="-rate"]');
+        
+        quantityInput.addEventListener('input', () => calculateItemTotal(newRow));
+        rateInput.addEventListener('input', () => calculateItemTotal(newRow));
+
+        // Remove item functionality for new row
+        newRow.querySelector('.remove-item').addEventListener('click', function() {
+            newRow.remove();
+        });
+
+        itemCount++;
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

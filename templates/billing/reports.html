@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Reports - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-chart-bar"></i> Generate Invoice Report</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Filter Options</h5>
+                            <div class="mb-3">
+                                {{ form.start_date|as_crispy_field }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.end_date|as_crispy_field }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.customer|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Include Fields</h5>
+                            <div class="mb-3">
+                                {{ form.include_fields }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-download"></i> Generate PDF Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Report Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Use this form to generate custom reports for your invoices:</p>
+                <ul>
+                    <li><strong>Date Range:</strong> Filter invoices by creation date</li>
+                    <li><strong>Customer:</strong> Filter for a specific customer or include all</li>
+                    <li><strong>Fields:</strong> Choose which fields to include in the report</li>
+                    <li><strong>Output:</strong> Reports are generated as PDF files for easy sharing and printing</li>
+                </ul>
+                <p class="text-muted">Leave date fields empty to include all invoices. Select "All Customers" to include invoices from all customers.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

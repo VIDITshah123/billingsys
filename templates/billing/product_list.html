@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box"></i> Products</h2>
+    <a href="{% url 'product_create' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Add New Product
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Search products by name or HSN code..." value="{{ search }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>HSN Code</th>
+                        <th>Unit</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.hsn_code }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ product.get_unit_display }}</span>
+                        </td>
+                        <td>{{ product.created_at|date:"d-m-Y" }}</td>
+                        <td>
+                            <a href="{% url 'product_update' product.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-box fa-3x text-muted mb-3"></i>
+            <h5>No products found</h5>
+            <p class="text-muted">Get started by adding your first product.</p>
+            <a href="{% url 'product_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

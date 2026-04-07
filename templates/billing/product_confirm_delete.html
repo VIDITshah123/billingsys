@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Product - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="fas fa-trash"></i> Delete Product</h4>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete the following product?</p>
+                <div class="alert alert-warning">
+                    <h5>{{ product.name }}</h5>
+                    <p><strong>HSN Code:</strong> {{ product.hsn_code }}</p>
+                    <p><strong>Unit:</strong> {{ product.get_unit_display }}</p>
+                </div>
+                <p class="text-danger">This action cannot be undone.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'product_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

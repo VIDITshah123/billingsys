@@ -1,0 +1,99 @@
+{% extends "base_flask.html" %}
+
+{% block title %}Reports - VIDHIM ENTERPRISES Billing System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-chart-bar"></i> Generate Invoice Report</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Filter Options</h5>
+                            <div class="mb-3">
+                                {{ form.start_date.label(class="form-label") }}
+                                {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else "")) }}
+                                {% if form.start_date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.start_date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.end_date.label(class="form-label") }}
+                                {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else "")) }}
+                                {% if form.end_date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.end_date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.customer.label(class="form-label") }}
+                                {{ form.customer(class="form-select" + (" is-invalid" if form.customer.errors else "")) }}
+                                {% if form.customer.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.customer.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Include Fields</h5>
+                            <div class="mb-3">
+                                {% for subfield in form.include_fields %}
+                                    <div class="form-check">
+                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield.label(class="form-check-label") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-download"></i> Generate PDF Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Report Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Use this form to generate custom reports for your invoices:</p>
+                <ul>
+                    <li><strong>Date Range:</strong> Filter invoices by creation date</li>
+                    <li><strong>Customer:</strong> Filter for a specific customer or include all</li>
+                    <li><strong>Fields:</strong> Choose which fields to include in the report</li>
+                    <li><strong>Output:</strong> Reports are generated as PDF files for easy sharing and printing</li>
+                </ul>
+                <p class="text-muted">Leave date fields empty to include all invoices. Select "All Customers" to include invoices from all customers.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
