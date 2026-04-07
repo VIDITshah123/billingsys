@@ -92,13 +92,10 @@ class Invoice(db.Model):
             self.cgst = Decimal('0')
             self.sgst = Decimal('0')
         
-        # Calculate roundoff
-        total_before_roundoff = self.subtotal + self.cgst + self.sgst + self.igst
-        decimal_part = total_before_roundoff - int(total_before_roundoff)
-        self.roundoff = Decimal('1') if decimal_part >= Decimal('0.5') else Decimal('0')
-
-        # Calculate total
-        self.total = self.subtotal + self.cgst + self.sgst + self.igst + self.roundoff
+        # Calculate total (no roundoff, convert to int)
+        total_with_taxes = self.subtotal + self.cgst + self.sgst + self.igst
+        self.total = int(total_with_taxes.quantize(Decimal('1')))  # Round to nearest integer
+        self.roundoff = Decimal('0')  # Set roundoff to 0 since we're not using it
 
     def __repr__(self):
         return f'<Invoice {self.invoice_number}>'
@@ -827,13 +824,8 @@ def generate_invoice_pdf(id):
                 [Paragraph("IGST @ 5%", totals_label), Paragraph(f"₹{invoice.igst:,.2f}", totals_value)]
             )
         
-        if invoice.roundoff != 0:
-            totals_data.append(
-                [Paragraph("Round Off", totals_label), Paragraph(f"₹{invoice.roundoff:,.2f}", totals_value)]
-            )
-        
         totals_data.append(
-            [Paragraph("<b>TOTAL</b>", totals_final_label), Paragraph(f"<b>₹{invoice.total:,.2f}</b>", totals_final_value)]
+            [Paragraph("<b>TOTAL</b>", totals_final_label), Paragraph(f"<b>Rs. {int(invoice.total):,}</b>", totals_final_value)]
         )
         
         # Right-align the totals table
