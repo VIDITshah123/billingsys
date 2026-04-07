@@ -79,22 +79,23 @@ class Invoice(db.Model):
             return
 
         # Calculate taxable value (subtotal)
-        self.subtotal = sum(item.quantity * item.rate for item in self.items)
+        from decimal import Decimal
+        self.subtotal = sum(Decimal(str(item.quantity)) * Decimal(str(item.rate)) for item in self.items)
         
         # Calculate taxes
         if self.tax_type == 'cgst_sgst':
-            self.cgst = self.subtotal * 0.025  # 2.5%
-            self.sgst = self.subtotal * 0.025  # 2.5%
-            self.igst = 0
+            self.cgst = self.subtotal * Decimal('0.025')  # 2.5%
+            self.sgst = self.subtotal * Decimal('0.025')  # 2.5%
+            self.igst = Decimal('0')
         else:  # IGST
-            self.igst = self.subtotal * 0.05   # 5%
-            self.cgst = 0
-            self.sgst = 0
-
+            self.igst = self.subtotal * Decimal('0.05')   # 5%
+            self.cgst = Decimal('0')
+            self.sgst = Decimal('0')
+        
         # Calculate roundoff
         total_before_roundoff = self.subtotal + self.cgst + self.sgst + self.igst
         decimal_part = total_before_roundoff - int(total_before_roundoff)
-        self.roundoff = 1 if decimal_part >= 0.5 else 0
+        self.roundoff = Decimal('1') if decimal_part >= Decimal('0.5') else Decimal('0')
 
         # Calculate total
         self.total = self.subtotal + self.cgst + self.sgst + self.igst + self.roundoff
