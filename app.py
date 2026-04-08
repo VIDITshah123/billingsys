@@ -66,7 +66,6 @@ class Invoice(db.Model):
     cgst = db.Column(db.Numeric(10, 2), default=0)
     sgst = db.Column(db.Numeric(10, 2), default=0)
     igst = db.Column(db.Numeric(10, 2), default=0)
-    roundoff = db.Column(db.Numeric(10, 2), default=0)
     total = db.Column(db.Numeric(10, 2), default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -95,7 +94,6 @@ class Invoice(db.Model):
         # Calculate total (no roundoff, convert to int)
         total_with_taxes = self.subtotal + self.cgst + self.sgst + self.igst
         self.total = int(total_with_taxes.quantize(Decimal('1')))  # Round to nearest integer
-        self.roundoff = Decimal('0')  # Set roundoff to 0 since we're not using it
 
     def __repr__(self):
         return f'<Invoice {self.invoice_number}>'
@@ -159,7 +157,6 @@ class ReportForm(FlaskForm):
         ('cgst', 'CGST'),
         ('sgst', 'SGST'),
         ('igst', 'IGST'),
-        ('roundoff', 'Roundoff'),
         ('total', 'Total'),
     ])
 
@@ -978,7 +975,6 @@ Subtotal: Rs. {invoice.subtotal:.2f}
 CGST (2.5%): Rs. {invoice.cgst:.2f}
 SGST (2.5%): Rs. {invoice.sgst:.2f}
 IGST (5%): Rs. {invoice.igst:.2f}
-Roundoff: Rs. {invoice.roundoff:.2f}
 TOTAL: Rs. {invoice.total:.2f}
 
 Generated on: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}
