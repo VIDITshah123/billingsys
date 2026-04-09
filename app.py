@@ -585,9 +585,11 @@ def generate_invoice_pdf(id):
             ('ALIGN', (0, 0), (0, 0), 'LEFT'),
             ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
         ]))
         story.append(header_table)
-        story.append(Spacer(1, 0.1*inch))
+        story.append(Spacer(1, 0.15*inch))
         
         # Accent line
         line_table = Table([['']], colWidths=[7*inch])
@@ -617,16 +619,14 @@ def generate_invoice_pdf(id):
             [
                 Paragraph("<b>Invoice Number</b>", label_style),
                 Paragraph("<b>Invoice Date</b>", label_style),
-                Paragraph("<b>Due Date</b>", label_style),
             ],
             [
                 Paragraph(f"<b>{invoice.invoice_number}</b>", info_style),
                 Paragraph(invoice.invoice_date.strftime('%B %d, %Y'), info_style),
-                Paragraph(invoice.invoice_date.strftime('%B %d, %Y'), info_style),  # Adjust if you have due_date
             ]
         ]
         
-        info_table = Table(invoice_info, colWidths=[2.33*inch, 2.33*inch, 2.33*inch])
+        info_table = Table(invoice_info, colWidths=[3.5*inch, 3.5*inch])
         info_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
