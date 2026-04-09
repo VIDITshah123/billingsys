@@ -734,8 +734,8 @@ def generate_invoice_pdf(id):
                 Paragraph(item.product.name, cell_style),
                 Paragraph(item.product.hsn_code, cell_style_center),
                 Paragraph(f"{item.quantity:.2f} {item.product.unit}", cell_style_center),
-                Paragraph(f"₹{item.rate:,.2f}", cell_style_right),
-                Paragraph(f"₹{item.total:,.2f}", cell_style_right),
+                Paragraph(f"Rs.{item.rate:,.2f}", cell_style_right),
+                Paragraph(f"Rs.{item.total:,.2f}", cell_style_right),
             ])
         
         items_table = Table(
@@ -808,17 +808,17 @@ def generate_invoice_pdf(id):
         
         # Build totals data based on tax type
         totals_data = [
-            [Paragraph("Subtotal", totals_label), Paragraph(f"₹{invoice.subtotal:,.2f}", totals_value)],
+            [Paragraph("Subtotal", totals_label), Paragraph(f"Rs.{invoice.subtotal:,.2f}", totals_value)],
         ]
         
         if invoice.tax_type == 'cgst_sgst':
             totals_data.extend([
-                [Paragraph("CGST @ 2.5%", totals_label), Paragraph(f"₹{invoice.cgst:,.2f}", totals_value)],
-                [Paragraph("SGST @ 2.5%", totals_label), Paragraph(f"₹{invoice.sgst:,.2f}", totals_value)],
+                [Paragraph("CGST @ 2.5%", totals_label), Paragraph(f"Rs.{invoice.cgst:,.2f}", totals_value)],
+                [Paragraph("SGST @ 2.5%", totals_label), Paragraph(f"Rs.{invoice.sgst:,.2f}", totals_value)],
             ])
         else:
             totals_data.append(
-                [Paragraph("IGST @ 5%", totals_label), Paragraph(f"₹{invoice.igst:,.2f}", totals_value)]
+                [Paragraph("IGST @ 5%", totals_label), Paragraph(f"Rs.{invoice.igst:,.2f}", totals_value)]
             )
         
         totals_data.append(
