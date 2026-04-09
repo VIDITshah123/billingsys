@@ -870,15 +870,18 @@ def generate_invoice_pdf(id):
         # Optional: Add bank details if you have them
         bank_details = Table([
             [Paragraph("<b>Bank Details</b>", footer_title)],
-            [Paragraph("Bank: State Bank of India", footer_text)],
-            [Paragraph("Account No: XXXX XXXX XXXX", footer_text)],
-            [Paragraph("IFSC: SBIN0XXXXXX", footer_text)],
+            [Paragraph("UNION BANK OF INDIA,BHAYANDAR EAST,JESAL PARK BRANCH", footer_text)],
+            [Paragraph("Account No: 510101006809654", footer_text)],
+            [Paragraph("IFSC: UBIN0904554", footer_text)],
         ], colWidths=[3*inch])
         
         terms = Table([
             [Paragraph("<b>Terms & Conditions</b>", footer_title)],
-            [Paragraph("1. Payment is due within 30 days", footer_text)],
-            [Paragraph("2. Please include invoice number in payment reference", footer_text)],
+            [Paragraph("1. Payment requested by crossed cheque payee A/c cheque/NEFT/RTGS only", footer_text)],
+            [Paragraph("2. Our responsibility ceases on delivery of the goods to transport", footer_text)],
+            [Paragraph("3. Goods supplied to order will not be accepted back", footer_text)],
+            [Paragraph("4. Subject to Mumbai Jurisdiction", footer_text)],
+            [Paragraph("5. Interest @24% p.a. will be charge on bill remaining unpaid after due date", footer_text)],
         ], colWidths=[3.5*inch])
         
         footer_table = Table([[bank_details, terms]], colWidths=[3.5*inch, 3.5*inch])
