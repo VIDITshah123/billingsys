@@ -5,7 +5,7 @@ from .models import Customer, Product, Invoice, InvoiceItem
 
 class CustomerForm(forms.ModelForm):
     gst_number = forms.CharField(
-        validators=[RegexValidator(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}Z[0-9]{1}$', 'Invalid GST number format')]
+        validators=[RegexValidator(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$', 'Invalid GST number format')]
     )
 
     class Meta:

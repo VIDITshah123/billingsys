@@ -123,7 +123,7 @@ class CustomerForm(FlaskForm):
     address = TextAreaField('Address', validators=[DataRequired()])
     gst_number = StringField('GST Number', validators=[
         DataRequired(), 
-        Regexp(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}Z[0-9]{1}$', message='Invalid GST number format')
+        Regexp(r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$', message='Invalid GST number format')
     ])
 
 class ProductForm(FlaskForm):
