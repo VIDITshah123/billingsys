@@ -1,45 +1,84 @@
 # VIDHIM ENTERPRISES Billing System
 
-A comprehensive web application for managing invoices, customers, and products for VIDHIM ENTERPRISES.
+A comprehensive Flask-based billing and invoicing system for VIDHIM ENTERPRISES with customer management, product catalog, invoice generation, and reporting capabilities.
 
 ## Features
 
-- **Customer Management**: Add, update, delete, and search customers with GST validation
-- **Product Management**: Manage products with HSN codes and unit types (kgs/units)
-- **Invoice Creation**: Create invoices with automatic tax calculations (CGST/SGST/IGST)
-- **PDF Generation**: Generate professional PDF invoices and reports
-- **Reporting System**: Filter and export invoices by date range and customer
-- **Responsive Design**: Modern Bootstrap 5 interface
+### 🏢 Company Management
+- Company information management
+- GST compliance for Indian businesses
+- Professional invoice generation
+
+### 👥 Customer Management
+- Add, edit, and delete customers
+- GST number validation
+- Customer search functionality
+- Inline customer addition for quick workflow
+
+### 📦 Product Management
+- Product catalog with HSN codes
+- Unit-based inventory (kgs/units)
+- Product search functionality
+- Inline product addition
+
+### 🧾 Invoice Management
+- Create professional invoices
+- Tax calculations (CGST 2.5%, SGST 2.5%, IGST 5%)
+- Multiple invoice items per invoice
+- PDF invoice generation with professional layout
+- Invoice item management (add/delete)
+
+### 📊 Reporting
+- Generate reports by date range
+- Customer-specific reports
+- Export to PDF and Excel formats
+- Selectable field inclusion
+- Quick date range buttons (Q1, Q2, Q3, Q4, Year)
+
+### 🔐 Authentication
+- User login system
+- Session management
+- Protected routes
+- JSON-based user storage
 
 ## Tax Calculations
 
-- **CGST**: 2.5% of taxable value
-- **SGST**: 2.5% of taxable value  
-- **IGST**: 5% of taxable value
-- **Roundoff**: Automatically calculated (0.50 and above rounds to 1)
-- **Total**: Taxable value + CGST + SGST + IGST + Roundoff
+The system follows Indian GST tax rules:
+- **CGST**: 2.5% of subtotal
+- **SGST**: 2.5% of subtotal
+- **IGST**: 5% of subtotal (for inter-state transactions)
+- **Total**: Subtotal + applicable taxes (rounded to nearest integer)
 
 ## Installation
 
 ### Prerequisites
-
 - Python 3.8+
 - pip package manager
 
-### Setup Instructions
+### Setup
 
-1. **Install Dependencies**:
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/billingsys.git
+   cd billingsys
+   ```
+
+2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run the Application**:
+3. **Run the application**:
    ```bash
    python app.py
    ```
 
-3. **Access Application**:
+4. **Access the application**:
    Open your browser and navigate to `http://127.0.0.1:5000`
+
+### Default Login
+- **Username**: admin
+- **Password**: admin123
 
 ## Company Information
 
