@@ -6,14 +6,14 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h4><i class="fas fa-plus"></i> Create New Invoice</h4>
+            <div class="card-header bg-warning">
+                <h4 class="mb-0"><i class="fas fa-file-invoice"></i> Create New Invoice</h4>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="invoiceForm">
                     {{ form.hidden_tag() }}
                     
-                    <div class="row mb-4">
+                    <div class="row mb-3">
                         <div class="col-md-3">
                             {{ form.invoice_number.label(class="form-label") }}
                             {{ form.invoice_number(class="form-control" + (" is-invalid" if form.invoice_number.errors else "")) }}
@@ -49,7 +49,7 @@
                         </div>
                         <div class="col-md-2">
                             {{ form.tax_type.label(class="form-label") }}
-                            {{ form.tax_type(class="form-select" + (" is-invalid" if form.tax_type.errors else "")) }}
+                            {{ form.tax_type(class="form-select" + (" is-invalid" if form.tax_type.errors else ""), id="tax_type") }}
                             {% if form.tax_type.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.tax_type.errors %}
@@ -59,14 +59,47 @@
                             {% endif %}
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('invoice_list') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-save"></i> Create Invoice
-                        </button>
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-cart-plus"></i> Add Items</h5>
+            </div>
+            <div class="card-body">
+                <form id="addItemForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label">Product *</label>
+                            <select id="item_product" class="form-select" required>
+                                <option value="">Select Product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }} ({{ product.hsn_code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantity *</label>
+                            <input type="number" id="item_quantity" class="form-control" step="0.01" min="0.01" required placeholder="Qty">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Rate (Rs.) *</label>
+                            <input type="number" id="item_rate" class="form-control" step="0.01" min="0" required placeholder="Rate">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Amount</label>
+                            <input type="text" id="item_amount" class="form-control" readonly placeholder="0.00">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -74,23 +107,226 @@
     </div>
 </div>
 
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-info-circle"></i> Invoice Creation Information</h5>
+                <h5><i class="fas fa-list"></i> Invoice Items</h5>
             </div>
             <div class="card-body">
-                <p>After creating the invoice, you will be able to:</p>
-                <ul>
-                    <li>Add multiple items to the invoice</li>
-                    <li>View automatic tax calculations (CGST/SGST/IGST)</li>
-                    <li>Download the invoice as PDF</li>
-                    <li>Edit invoice details if needed</li>
-                </ul>
-                <p class="text-muted">Tax rates: CGST (2.5%), SGST (2.5%), IGST (5%)</p>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>HSN</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <tr id="noItemsRow">
+                                <td colspan="7" class="text-center text-muted">No items added yet. Add items using the form above.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th class="text-end">Subtotal:</th>
+                        <td class="text-end" id="subtotal">Rs. 0.00</td>
+                    </tr>
+                    <tr id="cgstRow">
+                        <th class="text-end">CGST @ 2.5%:</th>
+                        <td class="text-end" id="cgst">Rs. 0.00</td>
+                    </tr>
+                    <tr id="sgstRow">
+                        <th class="text-end">SGST @ 2.5%:</th>
+                        <td class="text-end" id="sgst">Rs. 0.00</td>
+                    </tr>
+                    <tr id="igstRow" style="display: none;">
+                        <th class="text-end">IGST @ 5%:</th>
+                        <td class="text-end" id="igst">Rs. 0.00</td>
+                    </tr>
+                    <tr class="table-primary">
+                        <th class="text-end fs-5">TOTAL:</th>
+                        <td class="text-end fs-5 fw-bold" id="total">Rs. 0</td>
+                    </tr>
+                </table>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-warning btn-lg" id="createInvoiceBtn" onclick="submitInvoice()">
+                        <i class="fas fa-save"></i> Create Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{{ url_for('invoice_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let items = [];
+let productList = [];
+
+{% for product in products %}
+productList.push({
+    id: {{ product.id }},
+    name: '{{ product.name }}',
+    hsn_code: '{{ product.hsn_code }}',
+    unit: '{{ product.unit }}'
+});
+{% endfor %}
+
+function calculateAmount() {
+    const qty = parseFloat(document.getElementById('item_quantity').value) || 0;
+    const rate = parseFloat(document.getElementById('item_rate').value) || 0;
+    document.getElementById('item_amount').value = (qty * rate).toFixed(2);
+}
+
+document.getElementById('item_quantity').addEventListener('input', calculateAmount);
+document.getElementById('item_rate').addEventListener('input', calculateAmount);
+
+document.getElementById('addItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const productId = parseInt(document.getElementById('item_product').value);
+    const quantity = parseFloat(document.getElementById('item_quantity').value);
+    const rate = parseFloat(document.getElementById('item_rate').value);
+    
+    if (!productId || !quantity || !rate) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    const product = productList.find(p => p.id === productId);
+    
+    items.push({
+        product_id: productId,
+        product_name: product.name,
+        hsn_code: product.hsn_code,
+        unit: product.unit,
+        quantity: quantity,
+        rate: rate,
+        total: quantity * rate
+    });
+    
+    document.getElementById('item_product').value = '';
+    document.getElementById('item_quantity').value = '';
+    document.getElementById('item_rate').value = '';
+    document.getElementById('item_amount').value = '';
+    
+    renderItems();
+    calculateTotals();
+});
+
+function renderItems() {
+    const tbody = document.getElementById('itemsTableBody');
+    
+    if (items.length === 0) {
+        tbody.innerHTML = '<tr id="noItemsRow"><td colspan="7" class="text-center text-muted">No items added yet. Add items using the form above.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = items.map((item, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${item.product_name}</td>
+            <td>${item.hsn_code}</td>
+            <td>${item.quantity.toFixed(2)} ${item.unit}</td>
+            <td>Rs. ${item.rate.toFixed(2)}</td>
+            <td>Rs. ${item.total.toFixed(2)}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function removeItem(index) {
+    items.splice(index, 1);
+    renderItems();
+    calculateTotals();
+}
+
+function calculateTotals() {
+    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const taxType = document.getElementById('tax_type').value;
+    
+    let cgst = 0, sgst = 0, igst = 0;
+    
+    if (taxType === 'cgst_sgst') {
+        cgst = subtotal * 0.025;
+        sgst = subtotal * 0.025;
+    } else {
+        igst = subtotal * 0.05;
+    }
+    
+    const total = Math.round(subtotal + cgst + sgst + igst);
+    
+    document.getElementById('subtotal').textContent = 'Rs. ' + subtotal.toFixed(2);
+    document.getElementById('cgst').textContent = 'Rs. ' + cgst.toFixed(2);
+    document.getElementById('sgst').textContent = 'Rs. ' + sgst.toFixed(2);
+    document.getElementById('igst').textContent = 'Rs. ' + igst.toFixed(2);
+    document.getElementById('total').textContent = 'Rs. ' + total.toLocaleString('en-IN');
+    
+    document.getElementById('cgstRow').style.display = taxType === 'cgst_sgst' ? '' : 'none';
+    document.getElementById('sgstRow').style.display = taxType === 'cgst_sgst' ? '' : 'none';
+    document.getElementById('igstRow').style.display = taxType === 'igst' ? '' : 'none';
+}
+
+document.getElementById('tax_type').addEventListener('change', calculateTotals);
+
+function submitInvoice() {
+    if (items.length === 0) {
+        alert('Please add at least one item to the invoice');
+        return;
+    }
+    
+    const form = document.getElementById('invoiceForm');
+    const formData = new FormData(form);
+    
+    formData.append('items', JSON.stringify(items));
+    
+    fetch('{{ url_for("invoice_create_with_items") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.message || 'Error creating invoice');
+        }
+    })
+    .catch(error => {
+        alert('Error creating invoice: ' + error);
+    });
+}
+</script>
 {% endblock %}

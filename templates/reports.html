@@ -10,15 +10,25 @@
                 <h4><i class="fas fa-chart-bar"></i> Generate Invoice Report</h4>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="reportForm">
                     {{ form.hidden_tag() }}
                     
                     <div class="row">
                         <div class="col-md-6">
                             <h5>Filter Options</h5>
                             <div class="mb-3">
+                                <label class="form-label fw-bold">Quick Date Selection</label>
+                                <div class="btn-group mb-2 w-100" role="group">
+                                    <button type="button" class="btn btn-outline-primary" onclick="setQuarter(1)">Q1</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="setQuarter(2)">Q2</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="setQuarter(3)">Q3</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="setQuarter(4)">Q4</button>
+                                    <button type="button" class="btn btn-primary" onclick="setYear()">Year</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 {{ form.start_date.label(class="form-label") }}
-                                {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else "")) }}
+                                {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else ""), id="start_date") }}
                                 {% if form.start_date.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.start_date.errors %}
@@ -29,7 +39,7 @@
                             </div>
                             <div class="mb-3">
                                 {{ form.end_date.label(class="form-label") }}
-                                {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else "")) }}
+                                {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), id="end_date") }}
                                 {% if form.end_date.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.end_date.errors %}
@@ -52,10 +62,17 @@
                         </div>
                         <div class="col-md-6">
                             <h5>Include Fields</h5>
-                            <div class="mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="selectAllFields">
+                                <label class="form-check-label fw-bold" for="selectAllFields">
+                                    Select All Fields
+                                </label>
+                            </div>
+                            <hr>
+                            <div class="mb-3" id="fieldsCheckboxes">
                                 {% for subfield in form.include_fields %}
                                     <div class="form-check">
-                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield(class="form-check-input field-checkbox") }}
                                         {{ subfield.label(class="form-check-label") }}
                                     </div>
                                 {% endfor %}
@@ -67,9 +84,14 @@
                         <a href="{{ url_for('home') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Home
                         </a>
-                        <button type="submit" class="btn btn-info">
-                            <i class="fas fa-download"></i> Generate PDF Report
-                        </button>
+                        <div class="btn-group">
+                            <button type="submit" name="export_type" value="pdf" class="btn btn-info">
+                                <i class="fas fa-file-pdf"></i> Generate PDF Report
+                            </button>
+                            <button type="submit" name="export_type" value="excel" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export to Excel
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -86,14 +108,62 @@
             <div class="card-body">
                 <p>Use this form to generate custom reports for your invoices:</p>
                 <ul>
+                    <li><strong>Quick Date Selection:</strong> Use Q1-Q4 and Year buttons to quickly set date ranges</li>
                     <li><strong>Date Range:</strong> Filter invoices by creation date</li>
                     <li><strong>Customer:</strong> Filter for a specific customer or include all</li>
-                    <li><strong>Fields:</strong> Choose which fields to include in the report</li>
-                    <li><strong>Output:</strong> Reports are generated as PDF files for easy sharing and printing</li>
+                    <li><strong>Fields:</strong> Choose which fields to include in the report (or use "Select All")</li>
+                    <li><strong>Output:</strong> Reports can be generated as PDF or Excel files</li>
                 </ul>
                 <p class="text-muted">Leave date fields empty to include all invoices. Select "All Customers" to include invoices from all customers.</p>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const currentYear = new Date().getFullYear();
+
+function setQuarter(quarter) {
+    const startMonth = (quarter - 1) * 3;
+    const startDate = new Date(currentYear, startMonth, 1);
+    const endMonth = startMonth + 2;
+    const endDate = new Date(currentYear, endMonth + 1, 0);
+    
+    document.getElementById('start_date').value = formatDate(startDate);
+    document.getElementById('end_date').value = formatDate(endDate);
+}
+
+function setYear() {
+    const startDate = new Date(currentYear, 3, 1);
+    const endDate = new Date(currentYear + 1, 2, 31);
+    
+    document.getElementById('start_date').value = formatDate(startDate);
+    document.getElementById('end_date').value = formatDate(endDate);
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+}
+
+document.getElementById('selectAllFields').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.field-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = this.checked;
+    }.bind(this));
+});
+
+const allCheckboxes = document.querySelectorAll('.field-checkbox');
+allCheckboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        const selectAll = document.getElementById('selectAllFields');
+        const checkedCount = document.querySelectorAll('.field-checkbox:checked').length;
+        selectAll.checked = (checkedCount === allCheckboxes.length);
+    });
+});
+</script>
 {% endblock %}

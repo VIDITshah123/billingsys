@@ -5,9 +5,37 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-box"></i> Products</h2>
-    <a href="{{ url_for('product_create') }}" class="btn btn-success">
-        <i class="fas fa-plus"></i> Add New Product
-    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Product</h5>
+    </div>
+    <div class="card-body">
+        <form id="addProductForm" method="post" action="{{ url_for('product_inline_add') }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="name" id="productName" class="form-control" placeholder="Product Name *" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="hsn_code" id="productHsn" class="form-control" placeholder="HSN Code *" required pattern="[0-9]{4,8}" title="HSN code should be 4-8 digits">
+                </div>
+                <div class="col-md-3">
+                    <select name="unit" id="productUnit" class="form-select" required>
+                        <option value="">Select Unit *</option>
+                        <option value="kgs">Kilograms (kgs)</option>
+                        <option value="units">Units</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="productFormMessage" class="mt-2"></div>
+    </div>
 </div>
 
 <div class="card">
@@ -69,11 +97,38 @@
             <i class="fas fa-box fa-3x text-muted mb-3"></i>
             <h5>No products found</h5>
             <p class="text-muted">Get started by adding your first product.</p>
-            <a href="{{ url_for('product_create') }}" class="btn btn-success">
-                <i class="fas fa-plus"></i> Add Product
-            </a>
         </div>
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('addProductForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const formData = new FormData(form);
+    const messageDiv = document.getElementById('productFormMessage');
+    
+    fetch('{{ url_for("product_inline_add") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.innerHTML = '<div class="alert alert-success alert-dismissible fade show">' + data.message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+            form.reset();
+            setTimeout(() => { window.location.reload(); }, 1000);
+        } else {
+            messageDiv.innerHTML = '<div class="alert alert-danger alert-dismissible fade show">' + data.message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+        }
+    })
+    .catch(error => {
+        messageDiv.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+    });
+});
+</script>
 {% endblock %}
